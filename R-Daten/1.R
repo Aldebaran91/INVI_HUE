@@ -1,10 +1,4 @@
 library(shiny)
-d <- swiss
-fertility <- d[,1, drop = F]
-agriculture <- d[,2, drop = F]
-education <- d[,4, drop = F]
-catholic <- d[,5, drop = F]
-infant <- d[,6, drop = F]
 
 ui <- fluidPage(
   selectInput(inputId = "cmbData",
@@ -15,7 +9,8 @@ ui <- fluidPage(
                 "Education",
                 "Catholic",
                 "Infant")),
-  plotOutput("hist")
+  plotOutput("hist"),
+  verbatimTextOutput("stats")
 )
 
 server <- function(input, output) {
@@ -27,9 +22,12 @@ server <- function(input, output) {
            "Catholic" = swiss$Catholic,
            "Infant" = swiss$Infant.Mortality)
   })
-  
   output$hist <- renderPlot({
-    hist(datasetInput())
+    hist(datasetInput(),
+    main = input$cmbData)
+  })
+  output$stats <- renderPrint({
+    summary(datasetInput())
   })
 }
 
