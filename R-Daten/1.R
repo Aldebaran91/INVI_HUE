@@ -1,19 +1,23 @@
 library(shiny)
 
 ui <- fluidPage(
-  selectInput(inputId = "cmbData",
-              label = "Choose a dataset:", 
-              choices = c(
-                "Fertility",
-                "Agriculture",
-                "Education",
-                "Catholic",
-                "Infant")),
-  sliderInput("bw_adjust", label = "Bandwidth adjustment:",
-              min = 0.2, max = 2, value = 1, step = 0.2),
-  plotOutput("hist"),
-  verbatimTextOutput("stats")
+  sidebarPanel(
+    radioButtons(inputId = "cmbData",
+                label = "Choose a dataset:", 
+                choices = c(
+                  "Fertility",
+                  "Agriculture",
+                  "Education",
+                  "Catholic",
+                  "Infant")),
+    sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+                min = 0.2, max = 2, value = 1, step = 0.2)),
+  mainPanel(
+    plotOutput("hist"),
+    plotOutput("box"),
+    verbatimTextOutput("stats"))
 )
+
 
 server <- function(input, output) {
   datasetInput <- reactive({
@@ -30,6 +34,10 @@ server <- function(input, output) {
     main = input$cmbData)
     dens <- density(datasetInput(), adjust = input$bw_adjust)
     lines(dens, col = "blue")
+  })
+  
+  output$box <- renderPlot({
+    boxplot(datasetInput(), horizontal = T)
   })
   
   output$stats <- renderPrint({
