@@ -9,19 +9,21 @@ ui <- fluidPage(
                    "Agriculture",
                    "Education",
                    "Catholic",
-                   "Infant")),
+                   "Infant",
+                   "Fertility & Agriculture",
+                   "Education & Catholic")),
     radioButtons(inputId = "cmbVis",
                  label = "Choose a visualization:", 
                  choices = c(
                    "Plot",
+                   "4er Plot fü lm" = "4Plot",
                    "Boxplot",
-                   "Histogramm",
-                   "Matrix",
-                   "Mosaic")),
+                   "Histogramm (r=mean, b=median)" = "Histogramm",
+                   "Matrix")),
     sliderInput("bw_adjust", label = "Bandwidth adjustment for hist:",
                 min = 0.2, max = 2, value = 1, step = 0.2)),
   mainPanel(
-    plotOutput("out"))
+    plotOutput("out", height = 800))
 )
 
 
@@ -32,12 +34,21 @@ server <- function(input, output) {
        "Agriculture" = swiss$Agriculture,
        "Education" = swiss$Education,
        "Catholic" = swiss$Catholic,
-       "Infant" = swiss$Infant.Mortality)
+       "Infant" = swiss$Infant.Mortality,
+       "Fertility & Agriculture" = swiss$Fertility~swiss$Agriculture,
+       "Education & Catholic" = swiss$Education~swiss$Catholic)
   })
   
   output$out <- renderPlot({
     if (input$cmbVis == "Plot"){
       plot(datasetInput())
+      if (input$cmbData == "Fertility & Agriculture" ||
+          input$cmbData == "Education & Catholic"){
+        abline(lm(datasetInput()))
+      }
+    } else if (input$cmbVis == "4Plot") {
+      par(mfrow=c(2,2))
+      plot(lm(datasetInput()))
     } else if (input$cmbVis == "Boxplot") {
       boxplot(datasetInput(), horizontal = T)
     } else if (input$cmbVis == "Histogramm") {
@@ -45,6 +56,8 @@ server <- function(input, output) {
            main = input$cmbData)
       dens <- density(datasetInput(), adjust = input$bw_adjust)
       lines(dens, col = "blue")
+      abline(v = mean(datasetInput()), col="red", lwd=3, lty=2)
+      abline(v = median(datasetInput()), col="blue", lwd=3, lty=2)
     } else if (input$cmbVis == "Matrix") {
       panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
       {
@@ -57,10 +70,6 @@ server <- function(input, output) {
         text(0.5, 0.5, txt, cex = cex.cor * r)
       }
       pairs(swiss, lower.panel = panel.smooth, upper.panel = panel.cor)
-    } else if (input$cmbVis == "Mosaic") {
-      ## TODO
-      #library(vcd)
-      #mosaic(as.numeric(unlist(swiss)))
     }
   })
 }
