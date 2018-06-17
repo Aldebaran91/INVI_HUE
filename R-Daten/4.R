@@ -24,8 +24,8 @@ ui <- fluidPage(
                    "Geschlecht - Gestorben Kinder" = 14,
                    "Geschlecht - Mehr Männer als Frauen überlebt" = 15,
                    "Klasse Allgemein" = 16,
-                   "Klasse - Überlebt Erwachsene" = 17,
-                   "Klasse - Überlebt Kinder" = 18,
+                   "Klasse - 3. & Crew" = 17,
+                   "Klasse - 3. & Crew M/W" = 18,
                    "Klasse - Gestorben Erwachsene" = 19,
                    "Klasse - Gestorben Kinder" = 20))),
   mainPanel(
@@ -35,6 +35,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   # Allgemein
   library(ggplot2)
+  library(vcd)
   t <- as.data.frame(Titanic)
   adult <- subset(t, Age == 'Adult')
   child <- subset(t, Age == 'Child')
@@ -127,13 +128,26 @@ server <- function(input, output) {
         facet_wrap(~Survived) +
         ggtitle('Klassen - Allgemein')
     } else if (input$cmbData == 17) {
-      ggplot(adult_survived, aes(x = Class, y = Freq)) +
+      newTbl <- aggregate(survived$Freq, by=list(Class=survived$Class), FUN=sum)
+      died <- aggregate(died$Freq, by=list(Class=died$Class), FUN=sum)
+      newTbl$Lost <- died$x
+      newTbl$Total <- newTbl$x + died$x
+      newTbl$Survival <- newTbl$x / newTbl$Total
+      
+      ggplot(newTbl, aes(x = Class, y = Survival)) +
         geom_col(width = 0.5) +
         ggtitle('Klassen - Überlebt (Erwachsene)')
     } else if (input$cmbData == 18) {
-      ggplot(child_survived, aes(x = Class, y = Freq)) +
+      newTbl <- aggregate(survived$Freq, by=list(Class=survived$Class, Sex=survived$Sex), FUN=sum)
+      died <- aggregate(died$Freq, by=list(Class=died$Class, Sex=died$Sex), FUN=sum)
+      newTbl$Lost <- died$x
+      newTbl$Total <- newTbl$x + died$x
+      newTbl$Survival <- newTbl$x / newTbl$Total
+      
+      ggplot(newTbl, aes(x = Class, y = Survival)) +
         geom_col(width = 0.5) +
-        ggtitle('Klassen - Überlebt (Kinder)')
+        facet_wrap(~Sex) +
+        ggtitle('Klassen - Überlebt (Erwachsene)')
     } else if (input$cmbData == 19) {
       ggplot(adult_died, aes(x = Class, y = Freq)) +
         geom_col(width = 0.5) +
