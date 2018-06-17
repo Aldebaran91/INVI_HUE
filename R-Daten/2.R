@@ -53,8 +53,13 @@ server <- function(input, output) {
            main = input$cmbData)
       dens <- density(datasetInput(), adjust = input$bw_adjust)
       lines(dens, col = "blue")
-      abline(v = mean(datasetInput()), col="red", lwd=3, lty=2)
-      abline(v = median(datasetInput()), col="blue", lwd=3, lty=2)
+      
+      abline(v = mean(datasetInput()), col="red")
+      abline(v = median(datasetInput()), col="blue")
+      abline(v = RealMode(datasetInput()), col="green")
+      
+      legend("topright", legend=c("Mean", "Median", "Mode"),
+             col=c("red", "blue", "green"), lty=1)
     } else if (input$cmbVis == "Matrix") {
       panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
       {
