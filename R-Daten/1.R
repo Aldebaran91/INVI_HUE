@@ -10,8 +10,8 @@ ui <- fluidPage(
                    "Education",
                    "Catholic",
                    "Infant",
-                   "Education & Infant",
-                   "Education & Catholic")),
+                   "Education & Fertility",
+                   "Education & Agriculture")),
     radioButtons(inputId = "cmbVis",
                  label = "Choose a visualization:", 
                  choices = c(
@@ -35,15 +35,15 @@ server <- function(input, output) {
        "Education" = swiss$Education,
        "Catholic" = swiss$Catholic,
        "Infant" = swiss$Infant.Mortality,
-       "Education & Infant" = swiss$Education~swiss$Infant.Mortality,
-       "Education & Catholic" = swiss$Education~swiss$Catholic)
+       "Education & Fertility" = log(swiss$Education)~swiss$Fertility,
+       "Education & Agriculture" = log(swiss$Education)~swiss$Agriculture)
   })
   
   output$out <- renderPlot({
     if (input$cmbVis == "Plot"){
       plot(datasetInput())
-      if (input$cmbData == "Education & Infant" ||
-          input$cmbData == "Education & Catholic"){
+      if (input$cmbData == "Education & Fertility" ||
+          input$cmbData == "Education & Agriculture"){
         abline(lm(datasetInput()))
       }
     } else if (input$cmbVis == "4Plot") {
