@@ -1,4 +1,6 @@
 library(shiny)
+library(utils)
+library(psych)
 
 ui <- fluidPage(
   sidebarPanel(
@@ -56,7 +58,7 @@ server <- function(input, output) {
       
       abline(v = mean(datasetInput()), col="red")
       abline(v = median(datasetInput()), col="blue")
-      abline(v = RealMode(datasetInput()), col="green")
+      abline(v = getmode(datasetInput()), col="green")
       
       legend("topright", legend=c("Mean", "Median", "Mode"),
              col=c("red", "blue", "green"), lty=1)
@@ -74,6 +76,12 @@ server <- function(input, output) {
       pairs(s, lower.panel = panel.smooth, upper.panel = panel.cor)
     }
   })
+}
+
+# Create the function.
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
 shinyApp(ui = ui, server = server)
