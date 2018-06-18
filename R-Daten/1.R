@@ -13,15 +13,14 @@ ui <- fluidPage(
                    "Catholic",
                    "Infant",
                    "Education & Fertility",
-                   "Education & Agriculture",
-                   "Education & Fertility + Agriculture" = 3)),
+                   "Education & Agriculture")),
     radioButtons(inputId = "cmbVis",
                  label = "Choose a visualization:", 
                  choices = c(
                    "Plot",
                    "4er Plot fü lm" = "4Plot",
                    "Boxplot",
-                   "Histogramm (r=mean, b=median)" = "Histogramm",
+                   "Histogramm" = "Histogramm",
                    "Matrix")),
     sliderInput("bw_adjust", label = "Bandwidth adjustment for hist:",
                 min = 0.2, max = 2, value = 1, step = 0.2)),
@@ -39,8 +38,7 @@ server <- function(input, output) {
        "Catholic" = swiss$Catholic,
        "Infant" = swiss$Infant.Mortality,
        "Education & Fertility" = log(swiss$Education)~swiss$Fertility,
-       "Education & Agriculture" = log(swiss$Education)~swiss$Agriculture,
-       "Education & Fertility + Agriculture" = lm(Education~Agriculture+Fertility, data = as.data.frame(swiss)))
+       "Education & Agriculture" = log(swiss$Education)~swiss$Agriculture)
   })
   
   output$out <- renderPlot({

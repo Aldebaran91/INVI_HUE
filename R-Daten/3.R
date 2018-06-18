@@ -25,10 +25,13 @@ server <- function(input, output) {
       med <- median(LakeHuron)
       
       plot(LakeHuron)
-      qqline(med, col=1)
-      qqline(m, col=2)
-      qqline(m+mad(LakeHuron), col=3)
-      qqline(m-mad(LakeHuron), col=3)
+      qqline(med, col="red")
+      qqline(m, col="blue")
+      qqline(m+mad(LakeHuron), col="green")
+      qqline(m-mad(LakeHuron), col="green")
+      
+      legend("topright", legend=c("Median", "Mean", "M+MAD", "M-MAD"),
+             col=c("red", "blue", "green", "green"), lty=1)
     } else if (input$cmbVis == "Boxplot") {
       boxplot(LakeHuron, horizontal = T)
     } else if (input$cmbVis == "Histogramm") {
