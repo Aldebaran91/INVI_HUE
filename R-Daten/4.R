@@ -10,24 +10,25 @@ ui <- fluidPage(
                    "Alter Allgemein" = 0,
                    "Alter - Gestorben" = 1,
                    "Alter - Überlebt" = 2,
-                   "Alter - Überlebt Erwachsene" = 3,
-                   "Alter - Überlebt Kinder" = 4,
-                   "Alter - Gestorben Erwachsene" = 5,
-                   "Alter - Gestorben Kinder" = 6,
-                   "Alter - Sterberate 3. Klasse" = 7,
-                   "Alter - Sterberate Erwachsene" = 8,
-                   "Geschlecht - Überlebt/Gestorben" = 9,
-                   "Geschlecht - Überlebt" = 10,
+                   #"Alter - Überlebt Erwachsene" = 3,
+                   #"Alter - Überlebt Kinder" = 4,
+                   #"Alter - Gestorben Erwachsene" = 5,
+                   #"Alter - Gestorben Kinder" = 6,
+                   #"Alter - Sterberate 3. Klasse" = 7,
+                   #"Alter - Sterberate Erwachsene" = 8,
+                   "Geschlecht - Allgemein" = 9,
+                   #"Geschlecht - Überlebt" = 10,
                    "Geschlecht - Überlebt Erwachsene" = 11,
                    "Geschlecht - Überlebt Kinder" = 12,
                    "Geschlecht - Gestorben Erwachsene" = 13,
                    "Geschlecht - Gestorben Kinder" = 14,
                    "Geschlecht - Mehr Männer als Frauen überlebt" = 15,
-                   "Klasse Allgemein" = 16,
+                   "Klasse - Allgemein" = 16,
                    "Klasse - 3. & Crew" = 17,
-                   "Klasse - 3. & Crew M/W" = 18,
-                   "Klasse - Gestorben Erwachsene" = 19,
-                   "Klasse - Gestorben Kinder" = 20))),
+                   "Klasse - 3. & Crew M/W" = 18
+                   #"Klasse - Gestorben Erwachsene" = 19,
+                   #"Klasse - Gestorben Kinder" = 20
+                   ))),
   mainPanel(
     plotOutput("out", height = 800))
 )
@@ -50,14 +51,13 @@ server <- function(input, output) {
     if (input$cmbData == -1){
       mosaic(Titanic, fit = TRUE)
     } else if (input$cmbData == 0){
-      ggplot(t, aes(x = Class, y = Freq)) +
+      ggplot(t, aes(x = Survived, y = Freq)) +
         geom_col(width = 0.5) +
         facet_wrap(~Age) + 
         ggtitle('Alter - Allgemein')
     } else if (input$cmbData == 1) {
-      ggplot(died, aes(x = Class, y = Freq)) +
-        geom_col(width = 0.5) +
-        facet_wrap(~Age) + 
+      ggplot(died, aes(x = Age, y = Freq)) +
+        geom_col(width = 0.5) + 
         ggtitle('Alter - Gestorben')
     } else if (input$cmbData == 2) {
       ggplot(survived, aes(x = Class, y = Freq)) +
@@ -136,7 +136,7 @@ server <- function(input, output) {
       
       ggplot(newTbl, aes(x = Class, y = Survival)) +
         geom_col(width = 0.5) +
-        ggtitle('Klassen - Überlebt (Erwachsene)')
+        ggtitle('Klassen - Überlebt')
     } else if (input$cmbData == 18) {
       newTbl <- aggregate(survived$Freq, by=list(Class=survived$Class, Sex=survived$Sex), FUN=sum)
       died <- aggregate(died$Freq, by=list(Class=died$Class, Sex=died$Sex), FUN=sum)
@@ -147,7 +147,7 @@ server <- function(input, output) {
       ggplot(newTbl, aes(x = Class, y = Survival)) +
         geom_col(width = 0.5) +
         facet_wrap(~Sex) +
-        ggtitle('Klassen - Überlebt (Erwachsene)')
+        ggtitle('Klassen - Überlebt')
     } else if (input$cmbData == 19) {
       ggplot(adult_died, aes(x = Class, y = Freq)) +
         geom_col(width = 0.5) +
