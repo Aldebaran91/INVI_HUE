@@ -36,8 +36,9 @@ ui <- fluidPage(
                          mainPanel(
                            
                            helpText("Summary"), verbatimTextOutput("summary"),
-                           helpText("Expectation"), verbatimTextOutput("expectation"), 
-                           helpText("Variance"), verbatimTextOutput("variance"), 
+                           helpText("Mean"), verbatimTextOutput("mean"), 
+                           helpText("Variance"), verbatimTextOutput("variance"),
+                           helpText("Standard Deviation"), verbatimTextOutput("standarddeviation"),
                            helpText("Skewness"), verbatimTextOutput("skewness"), 
                            helpText("Kurtosis"),verbatimTextOutput("kurtosis"), plotOutput("out")))),
               tabPanel("Regression", plotOutput("pairs"),plotOutput("reg1"),plotOutput("reg2"),plotOutput("reg3"),plotOutput("reg5")),
@@ -58,7 +59,7 @@ ui <- fluidPage(
                                           "Life.Exp",
                                           "Frost"))
                          ),
-                       mainPanel(plotOutput("scatterplot"))
+                         mainPanel(plotOutput("scatterplotnt"), plotOutput("scatterplott"))
                        ))
   )
 )
@@ -99,6 +100,9 @@ server <- function(input, output) {
              col="red")
       abline(v=median(state.x77[,colnames(state.x77) %in% input$cmbData]),
              col="black")
+      legend("topright", legend=c("Mean", "Median"),
+             col=c("red", "black"), lty=1)
+      
     } else if (input$cmbVis == "Histogramm") {
       hist(s[,input$cmbData], probability = T, breaks = input$bins,
            main = input$cmbData, xlab = input$cmbData)
@@ -158,25 +162,50 @@ server <- function(input, output) {
   output$kurtosis <- renderPrint({
     kurtosis(s[,input$cmbData])
   })
-  output$expectation <- renderPrint({
+  output$mean <- renderPrint({
     mean(s[,input$cmbData])
   })
   output$variance <- renderPrint({
     var(s[,input$cmbData])
   })
+  output$standarddeviation <- renderPrint({
+    sd(s[,input$cmbData])
+  })
   output$skewness <- renderPrint({
     skewness(s[,input$cmbData])
   })
   
-  output$scatterplot <- renderPlot({
+  output$scatterplotnt <- renderPlot({
     # Render a scatterplot
+    plot(s[,input$cmbData2]~s[,input$cmbData1],
+         
+         main=paste("Scatterplot not transformed with the variables", input$cmbData1," and ", input$cmbData2),
+         ylab=input$cmbData1,
+         xlab=input$cmbData2)
+    abline(lm(s[,input$cmbData2]~s[,input$cmbData1]))
+  })
+  
+  output$scatterplott <- renderPlot({
+    # Render a scatterplot
+    if(input$cmbData1 == "Population"){
     plot(log(s[,input$cmbData1])~s[,input$cmbData2],
          
-         main=paste("Scatterplot over all States with the variables", input$cmbData1," and ", input$cmbData2),
+         main=paste("Scatterplot transformed with the variables", input$cmbData1," and ", input$cmbData2),
          ylab=input$cmbData1,
          xlab=input$cmbData2)
     abline(lm(log(s[,input$cmbData1])~s[,input$cmbData2]))
+    }
+    if(input$cmbData1 == "Income"){
+      plot(s[,input$cmbData1]~sqrt(s[,input$cmbData2]),
+           
+           main=paste("Scatterplot transformed with the variables", input$cmbData1," and ", input$cmbData2),
+           ylab=input$cmbData1,
+           xlab=input$cmbData2)
+      abline(lm(s[,input$cmbData1]~sqrt(s[,input$cmbData2])))
+    }
   })
+  
+  
 }
 
 
