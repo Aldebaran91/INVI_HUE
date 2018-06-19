@@ -46,7 +46,7 @@ server <- function(input, output) {
       plot(datasetInput())
       if (input$cmbData == "Education & Fertility" ||
           input$cmbData == "Education & Agriculture"){
-        abline(datasetInput())
+        abline(lm(datasetInput()))
       }
     } else if (input$cmbVis == "4Plot") {
       par(mfrow=c(2,2))
